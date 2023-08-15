@@ -21,6 +21,8 @@ find_package(rclcpp REQUIRED)
 find_package(ackermann_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
+
 
 
 if(BUILD_TESTING)
@@ -35,7 +37,7 @@ if(BUILD_TESTING)
 endif()
 
 add_executable(pure_pursuit_node src/pure_pursuit.cpp)
-ament_target_dependencies(pure_pursuit_node rclcpp ackermann_msgs geometry_msgs std_msgs)
+ament_target_dependencies(pure_pursuit_node rclcpp ackermann_msgs geometry_msgs std_msgs nav_msgs)
 
 install(TARGETS
   pure_pursuit_node

@@ -4,7 +4,7 @@ Launch regulated_pure_pursuit pkg
 
 ```bash
 source /opt/ros/foxy/setup.bash
-colcon build --packages-select f1_robot_model
+colcon build --packages-select regulated_pure_pursuit
 source install/setup.bash
 ros2 launch regulated_pure_pursuit pure_pursuit_launch.py
 ```
