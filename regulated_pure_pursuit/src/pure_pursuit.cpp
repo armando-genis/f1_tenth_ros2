@@ -17,7 +17,6 @@ public:
         RCLCPP_INFO(this->get_logger(), "First waypoint of x: %f", x_waypoints_[0]);
         RCLCPP_INFO(this->get_logger(), "First waypoint of y: %f", y_waypoints_[0]);
 
-
         // publisher and timer
         publisher_ = this->create_publisher<std_msgs::msg::String>("hi_topic", 10);
 
