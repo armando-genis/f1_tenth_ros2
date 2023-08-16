@@ -16,5 +16,12 @@ def generate_launch_description():
             name='pure_pursuit_node',
             output='screen',
             parameters=[waypoints_path]
+        ),
+        Node(
+            package='waypoint_visualizer',
+            executable='waypoint_visualizer_node',
+            name='waypoint_visualizer_node',
+            output='screen',
+            parameters=[waypoints_path]
         )
     ])
