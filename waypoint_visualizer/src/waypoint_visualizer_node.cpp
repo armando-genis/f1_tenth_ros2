@@ -31,7 +31,7 @@ private:
         for (size_t i = 0; i < x_waypoints_.size(); i++)
         {
             visualization_msgs::msg::Marker marker;
-            marker.header.frame_id = "odom_demo";
+            marker.header.frame_id = "odom";
             marker.header.stamp = this->get_clock()->now();
             marker.ns = "waypoints";
             marker.id = i;

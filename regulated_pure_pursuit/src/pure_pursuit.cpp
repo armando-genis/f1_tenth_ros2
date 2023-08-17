@@ -19,9 +19,6 @@ public:
         this->declare_parameter("max_lookahead", 0.0);
         this->declare_parameter("lookahead_ratio", 0.0);
 
-
-
-
         this->get_parameter("x", x_waypoints_);
         this->get_parameter("y", y_waypoints_);
         this->get_parameter("min_lookahead", min_lookahead_);
@@ -30,13 +27,13 @@ public:
 
 
         // Subscriber to Odometry message
-        subscription_ = this->create_subscription<nav_msgs::msg::Odometry>("/racecar/odom_racecar", 10, std::bind(&PurePursuit::odom_callback, this, std::placeholders::_1));
+        subscription_ = this->create_subscription<nav_msgs::msg::Odometry>("/odom", 10, std::bind(&PurePursuit::odom_callback, this, std::placeholders::_1));
 
         // Publisher for nearest waypoint and the next waypoint
         next_marker_publisher_ = this->create_publisher<visualization_msgs::msg::Marker>("next_waypoint_marker", 10);
 
         // Publisher for "cmd"
-        cmd_vel_publisher_ = this->create_publisher<geometry_msgs::msg::Twist>("/racecar/cmd_racecar", 10);
+        cmd_vel_publisher_ = this->create_publisher<geometry_msgs::msg::Twist>("/cmd_vel", 10);
         
         timer_ = this->create_wall_timer(std::chrono::milliseconds(200), std::bind(&PurePursuit::pub_callback, this));
 
@@ -45,8 +42,11 @@ public:
 
 private:
     void odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg) {
+        previous_pose_x_ = current_pose_x_;
+        previous_pose_y_ = current_pose_y_;
         current_pose_x_ = msg->pose.pose.position.x;
         current_pose_y_ = msg->pose.pose.position.y;
+        speed = 
     }
 
     void pub_callback() {
@@ -59,7 +59,7 @@ private:
             // Marker for next_point_index
             visualization_msgs::msg::Marker next_marker;
             next_marker.header.stamp = this->now();
-            next_marker.header.frame_id = "odom_demo";
+            next_marker.header.frame_id = "odom";
             next_marker.type = visualization_msgs::msg::Marker::SPHERE;
             next_marker.action = visualization_msgs::msg::Marker::ADD;
             next_marker.pose.position.x = x_waypoints_[next_point_index];
@@ -75,6 +75,7 @@ private:
             next_marker_publisher_->publish(next_marker);
 
         }
+
     }
 
     int find_nearest_point(double curr_x, double curr_y) {
@@ -97,6 +98,28 @@ private:
         }
     }
 
+    float stanley_control(double current_x, double current_y, double current_speed, 
+                           double current_yaw, double prev_waypoint_x, 
+                           double prev_waypoint_y, double next_waypoint_x, 
+                           double next_waypoint_y) 
+    {
+        float e_numerator = (next_waypoint_x-prev_waypoint_x) * (prev_waypoint_y-current_y) - (prev_waypoint_x - current_x) * (next_waypoint_y-prev_waypoint_y);
+        float e_denominator = sqrt((next_waypoint_x-prev_waypoint_x)**2 + (next_waypoint_y-prev_waypoint_y)**2);
+        float e = e_numerator/e_denominator;
+
+        float theta_track = atan2(next_waypoint_y-prev_waypoint_y, next_waypoint_x - prev_waypoint_x);
+        float heading_error = theta_track - current_yaw;
+        float theta_xc = atan2(v, k*e);
+        float delta = heading_error + theta_xc;
+        return delta;
+
+    }
+
+    const double k_ = 1.0;  // Cross track error gain
+    const double k_soft_ = 0.01;  // Softening factor to avoid division by zero
+
+
+
 
     rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr subscription_;
     rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr cmd_vel_publisher_;
@@ -104,8 +127,10 @@ private:
     rclcpp::TimerBase::SharedPtr timer_;
     std::vector<double> x_waypoints_;
     std::vector<double> y_waypoints_;
-    double current_pose_x_;
-    double current_pose_y_;
+    double current_pose_x_= 0;
+    double current_pose_y_= 0;
+    double previous_pose_x_ = 0;
+    double previous_pose_y_ = 0;
     double min_lookahead_;
     double max_lookahead_;
     double lookahead_ratio_;
