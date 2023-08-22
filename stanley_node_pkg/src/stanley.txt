@@ -8,9 +8,9 @@
 #include <algorithm>
 
 
-class PurePursuit : public rclcpp::Node {
+class StanleyController : public rclcpp::Node {
 public:
-    PurePursuit() : Node("pure_pursuit_node")
+    StanleyController() : Node("stanley_node")
      {
 
         this->declare_parameter("x", std::vector<double>{});
@@ -27,7 +27,7 @@ public:
 
 
         // Subscriber to Odometry message
-        subscription_ = this->create_subscription<nav_msgs::msg::Odometry>("/odom", 10, std::bind(&PurePursuit::odom_callback, this, std::placeholders::_1));
+        subscription_ = this->create_subscription<nav_msgs::msg::Odometry>("/odom", 10, std::bind(&StanleyController::odom_callback, this, std::placeholders::_1));
 
         // Publisher for nearest waypoint and the next waypoint
         next_marker_publisher_ = this->create_publisher<visualization_msgs::msg::Marker>("next_waypoint_marker", 10);
@@ -35,18 +35,18 @@ public:
         // Publisher for "cmd"
         cmd_vel_publisher_ = this->create_publisher<geometry_msgs::msg::Twist>("/cmd_vel", 10);
         
-        timer_ = this->create_wall_timer(std::chrono::milliseconds(200), std::bind(&PurePursuit::pub_callback, this));
+        timer_ = this->create_wall_timer(std::chrono::milliseconds(200), std::bind(&StanleyController::pub_callback, this));
 
         RCLCPP_INFO(this->get_logger(), "pure_pursuit_node initialized");
     }
 
 private:
     void odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg) {
-        // previous_pose_x_ = current_pose_x_;
-        // previous_pose_y_ = current_pose_y_;
+        previous_pose_x_ = current_pose_x_;
+        previous_pose_y_ = current_pose_y_;
         current_pose_x_ = msg->pose.pose.position.x;
         current_pose_y_ = msg->pose.pose.position.y;
-        // speed = 
+        
     }
 
     void pub_callback() {
@@ -98,22 +98,22 @@ private:
         }
     }
 
-    // float stanley_control(double current_x, double current_y, double current_speed, 
-    //                        double current_yaw, double prev_waypoint_x, 
-    //                        double prev_waypoint_y, double next_waypoint_x, 
-    //                        double next_waypoint_y) 
-    // {
-    //     float e_numerator = (next_waypoint_x-prev_waypoint_x) * (prev_waypoint_y-current_y) - (prev_waypoint_x - current_x) * (next_waypoint_y-prev_waypoint_y);
-    //     float e_denominator = sqrt((next_waypoint_x-prev_waypoint_x)**2 + (next_waypoint_y-prev_waypoint_y)**2);
-    //     float e = e_numerator/e_denominator;
+    float stanley_control(double current_x, double current_y, double current_speed, 
+                           double current_yaw, double prev_waypoint_x, 
+                           double prev_waypoint_y, double next_waypoint_x, 
+                           double next_waypoint_y) 
+    {
+        float e_numerator = (next_waypoint_x-prev_waypoint_x) * (prev_waypoint_y-current_y) - (prev_waypoint_x - current_x) * (next_waypoint_y-prev_waypoint_y);
+        float e_denominator = sqrt((next_waypoint_x-prev_waypoint_x)**2 + (next_waypoint_y-prev_waypoint_y)**2);
+        float e = e_numerator/e_denominator;
 
-    //     float theta_track = atan2(next_waypoint_y-prev_waypoint_y, next_waypoint_x - prev_waypoint_x);
-    //     float heading_error = theta_track - current_yaw;
-    //     float theta_xc = atan2(v, k*e);
-    //     float delta = heading_error + theta_xc;
-    //     return delta;
+        float theta_track = atan2(next_waypoint_y-prev_waypoint_y, next_waypoint_x - prev_waypoint_x);
+        float heading_error = theta_track - current_yaw;
+        float theta_xc = atan2(v, k*e);
+        float delta = heading_error + theta_xc;
+        return delta;
 
-    // }
+    }
 
     const double k_ = 1.0;  // Cross track error gain
     const double k_soft_ = 0.01;  // Softening factor to avoid division by zero
@@ -138,7 +138,7 @@ private:
 
 int main(int argc, char** argv) {
     rclcpp::init(argc, argv);
-    auto node = std::make_shared<PurePursuit>();
+    auto node = std::make_shared<StanleyController>();
     rclcpp::spin(node);
     rclcpp::shutdown();
     return 0;

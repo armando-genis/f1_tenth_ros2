@@ -9,11 +9,21 @@ source install/setup.bash
 ros2 launch regulated_pure_pursuit pure_pursuit_launch.py
 ```
 
+```bash
+source /opt/ros/foxy/setup.bash
+colcon build --packages-select stanley_node_pkg
+source install/setup.bash
+ros2 launch stanley_node_pkg stanley_controller.launch.py
+```
+
 ## Distribution
 ```bash
 f1_tenth_ros2/
 |-- regulated_pure_pursuit
 ```
+
+
+
 
 ## Authors
 
