@@ -22,8 +22,10 @@ f1_tenth_ros2/
 |-- regulated_pure_pursuit
 ```
 
-
-
+## Install
+```bash
+sudo apt-get install libeigen3-dev
+```
 
 ## Authors
 

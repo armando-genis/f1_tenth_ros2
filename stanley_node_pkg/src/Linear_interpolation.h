@@ -1,11 +1,6 @@
 #ifndef LINEAR_INTERPOLATION_H
 #define LINEAR_INTERPOLATION_H
 
-#include <iostream>
-#include <vector>
-#include <cmath>
-#include <Eigen/Dense>
-
 // ---------------------------------------------------------------------
 // 
 // ---------------------------------------------------------------------

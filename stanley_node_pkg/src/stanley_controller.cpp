@@ -8,6 +8,7 @@
 #include <cmath>
 #include <algorithm>
 #include <Eigen/Dense>
+#include <iostream>
 
 #include <cstdio>
 #include <vector>
@@ -44,11 +45,9 @@ public:
         this->get_parameter("wheelbase", yaw_rate_gain);
         this->get_parameter("dt", yaw_rate_gain);
 
-
         // Interpolate waypoints
         std::vector<Eigen::VectorXd> wp_interp = interpolateWaypoints(x_waypoints_, y_waypoints_, 0.01);
         RCLCPP_INFO(this->get_logger(), "value of dudoso : %zu", wp_interp.size());
-
 
         // Subscriber to Odometry message
         subscription_ = this->create_subscription<nav_msgs::msg::Odometry>("/odom", 10, std::bind(&StanleyController::odom_callback, this, std::placeholders::_1));
