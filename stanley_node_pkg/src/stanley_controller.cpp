@@ -7,7 +7,7 @@
 // C++
 #include <cmath>
 #include <algorithm>
-
+#include <Eigen/Dense>
 
 #include <cstdio>
 #include <vector>
@@ -16,6 +16,7 @@
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
 #include "Linear_interpolation.h"
+
 
 
 class StanleyController : public rclcpp::Node {
@@ -43,13 +44,19 @@ public:
         this->get_parameter("wheelbase", yaw_rate_gain);
         this->get_parameter("dt", yaw_rate_gain);
 
+
+        // Interpolate waypoints
+        std::vector<Eigen::VectorXd> wp_interp = interpolateWaypoints(x_waypoints_, y_waypoints_, 0.01);
+        RCLCPP_INFO(this->get_logger(), "value of dudoso : %zu", wp_interp.size());
+
+
         // Subscriber to Odometry message
         subscription_ = this->create_subscription<nav_msgs::msg::Odometry>("/odom", 10, std::bind(&StanleyController::odom_callback, this, std::placeholders::_1));
 
         // Publisher for "cmd"
         cmd_vel_publisher_ = this->create_publisher<geometry_msgs::msg::Twist>("/cmd_vel", 10);
         next_marker_publisher_ = this->create_publisher<visualization_msgs::msg::Marker>("next_waypoint_marker", 10);
-        
+        // Timer for publishing "cmd"
         timer_ = this->create_wall_timer(std::chrono::milliseconds(200), std::bind(&StanleyController::pub_callback, this));
 
         RCLCPP_INFO(this->get_logger(), "pure_pursuit_node initialized");

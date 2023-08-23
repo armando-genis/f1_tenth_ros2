@@ -26,6 +26,9 @@ find_package(nav_msgs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
+find_package(Eigen3 REQUIRED)
+
+
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -40,6 +43,8 @@ endif()
 
 add_executable(stanley_node src/stanley_controller.cpp)
 ament_target_dependencies(stanley_node rclcpp ackermann_msgs geometry_msgs std_msgs nav_msgs visualization_msgs tf2 tf2_ros tf2_geometry_msgs)
+target_link_libraries(stanley_node Eigen3::Eigen)
+
 
 install(TARGETS
   stanley_node

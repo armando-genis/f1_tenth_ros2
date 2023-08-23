@@ -36,7 +36,7 @@ std::vector<Eigen::VectorXd> interpolateWaypoints(
     // Linear interpolation
     std::vector<Eigen::VectorXd> wp_interp;
 
-    int interp_counter = 0;
+
     for (size_t i = 0; i < waypoints_np.size() - 1; i++) {
         wp_interp.push_back(waypoints_np[i]);
 
@@ -53,9 +53,5 @@ std::vector<Eigen::VectorXd> interpolateWaypoints(
 
     return wp_interp;
 }
-
-
-
-
 
 #endif
