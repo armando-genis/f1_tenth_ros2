@@ -17,7 +17,7 @@
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
 #include "Linear_interpolation.h"
-
+#include "subset_waypoints.h"
 
 
 class StanleyController : public rclcpp::Node {
@@ -46,8 +46,15 @@ public:
         this->get_parameter("dt", yaw_rate_gain);
 
         // Interpolate waypoints
-        std::vector<Eigen::VectorXd> wp_interp = interpolateWaypoints(x_waypoints_, y_waypoints_, 0.01);
-        RCLCPP_INFO(this->get_logger(), "value of dudoso : %zu", wp_interp.size());
+        WaypointData data = interpolateWaypoints(x_waypoints_, y_waypoints_, 0.01);
+        auto& interpolatedWaypoints = data.wp_interp;
+        auto& hashWaypoints = data.wp_interp_hash;
+        auto& wp_distance = data.wp_distance;
+        RCLCPP_INFO(this->get_logger(), "value of dudoso : %zu", interpolatedWaypoints.size());
+
+        for (size_t i = 0; i < x_waypoints_.size(); ++i) {
+            waypoints_np.push_back({x_waypoints_[i], y_waypoints_[i]});
+        }
 
         // Subscriber to Odometry message
         subscription_ = this->create_subscription<nav_msgs::msg::Odometry>("/odom", 10, std::bind(&StanleyController::odom_callback, this, std::placeholders::_1));
@@ -84,8 +91,12 @@ private:
     }
 
     void pub_callback() {
-        int target_idx = find_nearest_point(current_pose_x_,current_pose_y_);
-        marker_visualization(target_idx);
+        // int target_idx = find_nearest_point(current_pose_x_,current_pose_y_);
+        const auto& result = findClosestWaypoint(waypoints_np, current_pose_x_, current_pose_y_, wp_distance, hashWaypoints,interpolatedWaypoints);
+        auto& closestWaypointIndex = result.closest_index;
+        auto& newWaypoints = result.new_waypoints;
+
+        marker_visualization(closestWaypointIndex);
     }
 
     void marker_visualization(int next_point_index){
@@ -108,28 +119,6 @@ private:
         next_marker_publisher_->publish(next_marker);
     }
 
-
-    int find_nearest_point(double curr_x, double curr_y) {
-        std::vector<double> ranges;
-        for (size_t index = 0; index < x_waypoints_.size(); ++index) {
-            double eucl_x = std::pow(curr_x - x_waypoints_[index], 2);
-            double eucl_y = std::pow(curr_y - y_waypoints_[index], 2);
-            double eucl_d = std::sqrt(eucl_x + eucl_y);
-            ranges.push_back(eucl_d);
-        }
-        
-        auto min_it = std::min_element(ranges.begin(), ranges.end());
-        size_t closest_index = std::distance(ranges.begin(), min_it);
-
-        // Here's the condition implemented in C++
-        if (closest_index + 1 < x_waypoints_.size()) {
-            return closest_index + 1;
-        } else {
-            return x_waypoints_.size() - 1;
-        }
-    }
-
-
     rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr subscription_;
     rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr cmd_vel_publisher_;
     rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr next_marker_publisher_;
@@ -138,6 +127,10 @@ private:
     // variables of the parameters
     std::vector<double> x_waypoints_;
     std::vector<double> y_waypoints_;
+    std::vector<std::vector<double>> waypoints_np;
+    std::vector<Eigen::VectorXd> interpolatedWaypoints;
+    std::vector<int> hashWaypoints;
+    std::vector<double> wp_distance;
     double current_pose_x_= 0;
     double current_pose_y_= 0;
     double v = 0;
