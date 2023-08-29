@@ -5,7 +5,6 @@
 // 
 // ---------------------------------------------------------------------
 
-
 struct WaypointData {
     std::vector<Eigen::VectorXd> wp_interp;
     std::vector<int> wp_interp_hash;
@@ -19,8 +18,6 @@ WaypointData interpolateWaypoints(
 {
     std::vector<Eigen::VectorXd> waypoints_np;
     
-
-
     // Populate waypoints_np using x and y vectors
     for (size_t i = 0; i < x.size(); i++) {
         Eigen::VectorXd waypoint(2);

@@ -35,7 +35,7 @@ private:
             marker.header.stamp = this->get_clock()->now();
             marker.ns = "waypoints";
             marker.id = i;
-            marker.type = visualization_msgs::msg::Marker::SPHERE;
+            marker.type = visualization_msgs::msg::Marker::CUBE;
             marker.action = visualization_msgs::msg::Marker::ADD;
             marker.pose.position.x = x_waypoints_[i];
             marker.pose.position.y = y_waypoints_[i];
@@ -44,9 +44,9 @@ private:
             marker.scale.y = 0.2;
             marker.scale.z = 0.2;
             marker.color.a = 1.0; 
-            marker.color.r = 0.0;
-            marker.color.g = 1.0;
-            marker.color.b = 0.0;
+            marker.color.r = 1.0;
+            marker.color.g = 0.0;
+            marker.color.b = 0.25;
 
             marker_array.markers.push_back(marker);
         }

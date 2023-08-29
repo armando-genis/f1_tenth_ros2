@@ -60,16 +60,16 @@ ClosestWaypointResult findClosestWaypoint(const std::vector<std::vector<double>>
 
     size_t waypoint_subset_last_index = closest_index;
     double total_distance_ahead = 0.0;
-    while (total_distance_ahead < 20) {
-        total_distance_ahead += wp_distance[waypoint_subset_last_index];
-        waypoint_subset_last_index++;
 
-        if (waypoint_subset_last_index >= waypoints_np.size()) {
-            waypoint_subset_last_index = waypoints_np.size() - 1;
+    while (total_distance_ahead < 2) {
+        if (waypoint_subset_last_index >= waypoints_np.size() || waypoint_subset_last_index >= wp_distance.size()) {
+            waypoint_subset_last_index = std::min(waypoints_np.size(), wp_distance.size()) - 1;
             break;
         }
+        total_distance_ahead += wp_distance[waypoint_subset_last_index];
+        waypoint_subset_last_index++;
     }
-    
+
     std::vector<Eigen::VectorXd> new_waypoints( 
         wp_interp.begin() + wp_interp_hash[waypoint_subset_first_index],
         wp_interp.begin() + wp_interp_hash[waypoint_subset_last_index] + 1

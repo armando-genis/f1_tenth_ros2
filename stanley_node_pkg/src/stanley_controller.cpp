@@ -4,20 +4,23 @@
 #include <geometry_msgs/msg/twist.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include <visualization_msgs/msg/marker.hpp>
+#include <visualization_msgs/msg/marker_array.hpp>
+
 // C++
 #include <cmath>
 #include <algorithm>
 #include <Eigen/Dense>
 #include <iostream>
-
 #include <cstdio>
 #include <vector>
 #include <tf2/LinearMath/Matrix3x3.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <limits>
 
 #include "Linear_interpolation.h"
 #include "subset_waypoints.h"
+#include "stanley_algorithm.h"
 
 
 class StanleyController : public rclcpp::Node {
@@ -47,9 +50,10 @@ public:
 
         // Interpolate waypoints
         WaypointData data = interpolateWaypoints(x_waypoints_, y_waypoints_, 0.01);
-        auto& interpolatedWaypoints = data.wp_interp;
-        auto& hashWaypoints = data.wp_interp_hash;
-        auto& wp_distance = data.wp_distance;
+        interpolatedWaypoints = data.wp_interp;
+        hashWaypoints = data.wp_interp_hash;
+        wp_distance = data.wp_distance;
+
         RCLCPP_INFO(this->get_logger(), "value of dudoso : %zu", interpolatedWaypoints.size());
 
         for (size_t i = 0; i < x_waypoints_.size(); ++i) {
@@ -61,7 +65,12 @@ public:
 
         // Publisher for "cmd"
         cmd_vel_publisher_ = this->create_publisher<geometry_msgs::msg::Twist>("/cmd_vel", 10);
+        // publishers for visualization and debugging
         next_marker_publisher_ = this->create_publisher<visualization_msgs::msg::Marker>("next_waypoint_marker", 10);
+        marker_array_publisher_ = this->create_publisher<visualization_msgs::msg::MarkerArray>("interpolated_waypoints_markers", 10);
+        marker_newWaypoints_publisher_ = this->create_publisher<visualization_msgs::msg::MarkerArray>("newWaypoints", 10);
+
+        
         // Timer for publishing "cmd"
         timer_ = this->create_wall_timer(std::chrono::milliseconds(200), std::bind(&StanleyController::pub_callback, this));
 
@@ -92,11 +101,19 @@ private:
 
     void pub_callback() {
         // int target_idx = find_nearest_point(current_pose_x_,current_pose_y_);
-        const auto& result = findClosestWaypoint(waypoints_np, current_pose_x_, current_pose_y_, wp_distance, hashWaypoints,interpolatedWaypoints);
+        const auto& result = findClosestWaypoint(waypoints_np, current_pose_x_, current_pose_y_, wp_distance, hashWaypoints, interpolatedWaypoints);
         auto& closestWaypointIndex = result.closest_index;
-        auto& newWaypoints = result.new_waypoints;
+        newWaypoints = result.new_waypoints;
 
-        marker_visualization(closestWaypointIndex);
+
+        double steering_output = lateralController(newWaypoints, current_pose_x_, current_pose_y_, vehicle_yaw, v);
+        
+        RCLCPP_INFO(this->get_logger(), "value of dudoso : %f", steering_output);
+
+
+        // marker_visualization(closestWaypointIndex);
+        // visualizeInterpolatedWaypoints();
+        visualizeNewWaypoints();
     }
 
     void marker_visualization(int next_point_index){
@@ -104,24 +121,79 @@ private:
         visualization_msgs::msg::Marker next_marker;
         next_marker.header.stamp = this->now();
         next_marker.header.frame_id = "odom";
-        next_marker.type = visualization_msgs::msg::Marker::SPHERE;
+        next_marker.type = visualization_msgs::msg::Marker::CUBE;
         next_marker.action = visualization_msgs::msg::Marker::ADD;
         next_marker.pose.position.x = x_waypoints_[next_point_index];
         next_marker.pose.position.y = y_waypoints_[next_point_index];
-        next_marker.scale.x = 0.2;
-        next_marker.scale.y = 0.4;
-        next_marker.scale.z = 0.4;
+        next_marker.scale.x = 0.15;
+        next_marker.scale.y = 0.15;
+        next_marker.scale.z = 0.15;
         next_marker.color.a = 1.0;
         next_marker.color.r = 1.0;   // blue color for differentiation
-        next_marker.color.g = 0.0;
+        next_marker.color.g = 0.8;
         next_marker.color.b = 0.0;
         
         next_marker_publisher_->publish(next_marker);
     }
 
+    void visualizeInterpolatedWaypoints() {
+        visualization_msgs::msg::MarkerArray marker_array;
+
+        for (size_t i = 0; i < interpolatedWaypoints.size(); ++i) {
+            visualization_msgs::msg::Marker marker;
+            marker.header.stamp = this->now();
+            marker.header.frame_id = "odom";
+            marker.id = i;  // Unique ID for each marker
+            marker.type = visualization_msgs::msg::Marker::SPHERE;
+            marker.action = visualization_msgs::msg::Marker::ADD;
+            marker.pose.position.x = interpolatedWaypoints[i](0);  // Assuming x is the first element
+            marker.pose.position.y = interpolatedWaypoints[i](1);  // Assuming y is the second element
+            marker.scale.x = 0.1;
+            marker.scale.y = 0.1;
+            marker.scale.z = 0.1;
+            marker.color.a = 1.0;
+            marker.color.r = 0.9;   
+            marker.color.g = 0.5;
+            marker.color.b = 1.0;
+            
+            marker_array.markers.push_back(marker);
+        }
+        
+        marker_array_publisher_->publish(marker_array);
+    }
+
+    void visualizeNewWaypoints() {
+        visualization_msgs::msg::MarkerArray marker_array;
+
+        for (size_t i = 0; i < newWaypoints.size(); ++i) {
+            visualization_msgs::msg::Marker marker;
+            marker.header.stamp = this->now();
+            marker.header.frame_id = "odom";
+            marker.id = i + 1000;  // Unique ID for each marker, added 1000 to distinguish from other markers
+            marker.type = visualization_msgs::msg::Marker::SPHERE;
+            marker.action = visualization_msgs::msg::Marker::ADD;
+            marker.pose.position.x = newWaypoints[i](0);  // Assuming x is the first element
+            marker.pose.position.y = newWaypoints[i](1);  // Assuming y is the second element
+            marker.scale.x = 0.12;  // Slightly larger than interpolated for differentiation
+            marker.scale.y = 0.12;
+            marker.scale.z = 0.12;
+            marker.color.a = 1.0;
+            marker.color.r = 1.0;
+            marker.color.g = 0.0;
+            marker.color.b = 0.5;
+            
+            marker_array.markers.push_back(marker);
+        }
+        
+        marker_newWaypoints_publisher_->publish(marker_array);
+    }
+
+
     rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr subscription_;
     rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr cmd_vel_publisher_;
     rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr next_marker_publisher_;
+    rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_array_publisher_;
+    rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_newWaypoints_publisher_;
     rclcpp::TimerBase::SharedPtr timer_;
 
     // variables of the parameters
@@ -129,6 +201,8 @@ private:
     std::vector<double> y_waypoints_;
     std::vector<std::vector<double>> waypoints_np;
     std::vector<Eigen::VectorXd> interpolatedWaypoints;
+    std::vector<Eigen::VectorXd> newWaypoints;
+    
     std::vector<int> hashWaypoints;
     std::vector<double> wp_distance;
     double current_pose_x_= 0;
