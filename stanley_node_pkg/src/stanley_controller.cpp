@@ -25,7 +25,7 @@
 
 class StanleyController : public rclcpp::Node {
 public:
-    StanleyController() : Node("stanley_node")
+    StanleyController() : Node("stanley_node_not_working")
      {
 
         this->declare_parameter("x", std::vector<double>{});
