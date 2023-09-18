@@ -41,7 +41,7 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-add_executable(stanley_node src/StanleyNode.cpp src/Linear_Interpolation.cpp)
+add_executable(stanley_node src/StanleyNode.cpp src/Linear_Interpolation.cpp src/StanleyController.cpp)
 ament_target_dependencies(stanley_node rclcpp ackermann_msgs geometry_msgs std_msgs nav_msgs visualization_msgs tf2 tf2_ros tf2_geometry_msgs)
 target_link_libraries(stanley_node Eigen3::Eigen)
 
