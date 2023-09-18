@@ -41,10 +41,7 @@ private:
     vector<double> wp_distance;
 
     // Stanley controller
-    
     vector<Eigen::VectorXd> new_waypoints;
-
-
 
     void odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg);
     void pub_callback();
