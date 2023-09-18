@@ -1,16 +1,10 @@
 # f1_tenth_ros2
  
-Launch regulated_pure_pursuit pkg
+Launch stanley_controller pkg
 
 ```bash
 source /opt/ros/foxy/setup.bash
-colcon build --packages-select regulated_pure_pursuit
-source install/setup.bash
-ros2 launch regulated_pure_pursuit pure_pursuit_launch.py
-```
-
-```bash
-source /opt/ros/foxy/setup.bash
+source /opt/ros/humble/setup.bash
 colcon build --packages-select stanley_node_pkg
 source install/setup.bash
 ros2 launch stanley_node_pkg stanley_controller.launch.py

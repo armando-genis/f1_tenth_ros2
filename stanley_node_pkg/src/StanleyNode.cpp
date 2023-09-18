@@ -49,7 +49,6 @@ private:
     void visualizeNewWaypoints();
     void publishAckermannDrive(double speed, double steering_angle);
 
-
     // ROS2
     rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_subscriber_;
     rclcpp::Publisher<ackermann_msgs::msg::AckermannDriveStamped>::SharedPtr ackermann_cmd_publisher_;
@@ -62,7 +61,6 @@ public:
     StanleyNode(/* args */);
     ~StanleyNode();
 };
-
 
 StanleyNode::StanleyNode(/* args */) : Node("stanley_node")
 {
@@ -99,7 +97,6 @@ StanleyNode::~StanleyNode()
 {
 }
 
-
 void StanleyNode::odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg)
 {
     current_pose_x_ = msg->pose.pose.position.x;
@@ -121,7 +118,6 @@ void StanleyNode::odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg)
     current_pose_yaw_ = yaw;
     double degrees = current_pose_yaw_ * (180.0 / M_PI);
     // RCLCPP_INFO(this->get_logger(), "Yaw in degrees: %f", degrees);
-
 }
 
 void StanleyNode::pub_callback()
@@ -137,8 +133,11 @@ void StanleyNode::pub_callback()
     controller.computeSteeringAngle(current_pose_yaw_, current_velocity_);
     double steering_output = controller.GetDelta();
     RCLCPP_INFO(this->get_logger(), "steering_output: %f", steering_output);
-    double computed_speed = 0.8;
-    publishAckermannDrive(computed_speed, steering_output);
+    double computed_speed = 1.0;
+    double target_speed = 10.0 / 3.6; // [m/s] 30 km/h to [m/s]
+    controller.computePID(target_speed, current_velocity_);
+    double pid = controller.GetPid();
+    publishAckermannDrive(pid, steering_output);
     // RCLCPP_INFO(this->get_logger(), "doing");
 }
 
