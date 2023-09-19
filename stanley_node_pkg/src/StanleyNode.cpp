@@ -98,8 +98,6 @@ StanleyNode::StanleyNode(/* args */) : Node("stanley_node")
     target_idx_marker_publisher_ = this->create_publisher<visualization_msgs::msg::Marker>("target_idx_marker", 10);
     yaw_path_marker_publisher_ = this->create_publisher<visualization_msgs::msg::Marker>("yaw_path_marker", 10);
 
-
-
     timer_ = this->create_wall_timer(std::chrono::milliseconds(200), std::bind(&StanleyNode::pub_callback, this));
     RCLCPP_INFO(this->get_logger(), "Stanley_controller_node initialized");
 
@@ -246,11 +244,11 @@ void StanleyNode::visualizeYawPath(double yaw_path, double target_idx, double st
     yaw_marker.pose.position.x = new_waypoints[static_cast<int>(target_idx)](0);
     yaw_marker.pose.position.y = new_waypoints[static_cast<int>(target_idx)](1);
     yaw_marker.pose.position.z = 2.0;  // Adjust height as per your needs
-    yaw_marker.scale.z = 0.6;  // Text size
+    yaw_marker.scale.z = 0.4;  // Text size
     yaw_marker.color.a = 1.0;  // Fully opaque
-    yaw_marker.color.r = 0.9;  // Pink color for differentiation
-    yaw_marker.color.g = 0.9;
-    yaw_marker.color.b = 0.9;
+    yaw_marker.color.r = 1.0;  // Pink color for differentiation
+    yaw_marker.color.g = 1.0;
+    yaw_marker.color.b = 1.0;
 
     yaw_marker.text = "Yaw Path: " + std::to_string(yaw_path) + "\nsteering_output: " + std::to_string(steering_output) + "\nerror_front_axle: " + std::to_string(error_front_axle);
 

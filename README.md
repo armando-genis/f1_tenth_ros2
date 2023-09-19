@@ -1,6 +1,7 @@
 # f1_tenth_ros2
  
-Launch stanley_controller pkg
+This repository contains the stanley_controller package for ROS2, enabling better control for F1/10 autonomous racing.
+![Description of GIF](URL_TO_YOUR_GIF)
 
 ```bash
 source /opt/ros/foxy/setup.bash
