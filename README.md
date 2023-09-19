@@ -2,7 +2,7 @@
  
 This repository contains the stanley_controller package for ROS2, enabling better control for F1/10 autonomous racing.
 
-![Description of GIF](https://github.com/armando-genis/f1_tenth_ros2/raw/main/images/car_f1_10.gif)
+![Description of GIF](https://github.com/armando-genis/f1_tenth_ros2/blob/main/images/car_f1_10.gif)
 
 ```bash
 source /opt/ros/foxy/setup.bash
