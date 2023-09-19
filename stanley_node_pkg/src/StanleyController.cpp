@@ -38,6 +38,10 @@ double StanleyController::GetDelta() const{
     return delta;
 }
 
+double StanleyController::GetYawpath() const{
+    return yaw_path;
+}
+
 double StanleyController::GetNormaliceAngle(double angle){
     // ---------------------------------------------------------------------
     // Normalize an angle to [-pi, pi].
@@ -110,7 +114,7 @@ void StanleyController::findClosestWaypoint(double current_x, double current_y,c
     size_t waypoint_subset_last_index = closest_index;
     double total_distance_ahead = 0.0;
 
-    while (total_distance_ahead < 3) {
+    while (total_distance_ahead < 2) {
         if (waypoint_subset_last_index >= waypoints.size() || waypoint_subset_last_index >= wp_distance.size()) {
             waypoint_subset_last_index = std::min(waypoints.size(), wp_distance.size()) - 1;
             break;
@@ -165,7 +169,7 @@ void StanleyController::computeSteeringAngle(double current_yaw, double v){
     // yaw_target2 = GetNormaliceAngle(yaw_target2);
     // double yaw_of_the_last_point = std::atan2(new_waypoints.back()[1]-new_waypoints[new_waypoints.size()-2][1], new_waypoints.back()[0]-new_waypoints[new_waypoints.size()-2][0]);
     // yaw_of_the_last_point = GetNormaliceAngle(yaw_of_the_last_point);
-    double yaw_path = std::atan2(new_waypoints.back()[1]-new_waypoints.front()[1], new_waypoints.back()[0]-new_waypoints.front()[0]);
+    yaw_path = std::atan2(new_waypoints.back()[1]-new_waypoints.front()[1], new_waypoints.back()[0]-new_waypoints.front()[0]);
     yaw_path = GetNormaliceAngle(yaw_path);
 
     double theta_e = GetNormaliceAngle(yaw_path - current_yaw);

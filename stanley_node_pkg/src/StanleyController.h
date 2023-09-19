@@ -21,6 +21,7 @@ private:
     double target_idx = 0.0;
     double pid = 0.0;
     double delta = 0.0;
+    double yaw_path = 0.0;
 
 public:
     StanleyController(vector<Eigen::VectorXd> waypoints);
@@ -46,6 +47,7 @@ public:
     double GetErrorFrontAxle() const;
     double GetPid() const;
     double GetDelta() const;
+    double GetYawpath() const;
 
     // void Controller();
 };
