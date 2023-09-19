@@ -2,14 +2,32 @@
  
 This repository contains the stanley_controller package for ROS2, enabling better control for F1/10 autonomous racing.
 
+## Install
+```bash
+sudo apt-get install libeigen3-dev
+sudo apt install ros-<ros2-distro>-ackermann-msgs
+```
+
+# Stanley controller/Lateral controller
+
 ![Description of GIF](https://github.com/armando-genis/f1_tenth_ros2/blob/main/images/car_f1_10.gif)
 
 ```bash
-source /opt/ros/foxy/setup.bash
-source /opt/ros/humble/setup.bash
+source /opt/ros/foxy/setup.bash #for ros2 foxy
+source /opt/ros/humble/setup.bash #for ro2 humble
 colcon build --packages-select stanley_node_pkg
 source install/setup.bash
 ros2 launch stanley_node_pkg stanley_controller.launch.py
+```
+
+# obstacle avoidance
+
+```bash
+source /opt/ros/foxy/setup.bash #for ros2 foxy
+source /opt/ros/humble/setup.bash #for ro2 humble
+colcon build --packages-select obstacle_pkg
+source install/setup.bash
+ros2 launch obstacle_pkg Obstacles.launch.py
 ```
 
 ## Distribution
@@ -18,10 +36,7 @@ f1_tenth_ros2/
 |-- regulated_pure_pursuit
 ```
 
-## Install
-```bash
-sudo apt-get install libeigen3-dev
-```
+
 
 ## Authors
 

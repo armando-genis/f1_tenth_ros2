@@ -22,4 +22,18 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
+
+add_executable(obstacle_avoidance_node src/Obstacles.cpp)
+ament_target_dependencies(obstacle_avoidance_node rclcpp std_msgs)
+
+install(TARGETS
+  obstacle_avoidance_node
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+install(
+  DIRECTORY launch src
+  DESTINATION share/${PROJECT_NAME}
+)
+
 ament_package()
