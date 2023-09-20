@@ -118,6 +118,7 @@ void Obstacles::scan_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg)
     }
     if (!current_cluster.empty()) {
         clusters.push_back(current_cluster);
+        clusters.clear();
     }
 
     // RCLCPP_INFO(this->get_logger(), "Number of clusters detected: %d", numOfClusters);

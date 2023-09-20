@@ -9,6 +9,7 @@ sudo apt install ros-<ros2-distro>-ackermann-msgs
 ```
 
 # Stanley controller/Lateral controller
+The Stanley controller, often referred to as a lateral controller. Its primary role is to reduce the cross-track error (the lateral distance between the vehicle's current position and a reference path) as the vehicle progresses forward. By doing so, the Stanley controller ensures that the vehicle follows the desired trajectory as closely as possible. We use the `yaw of the path making a subset of interpollated waypoints` that are within some lookahead distance from the closest point to the car.
 
 ![Description of GIF](https://github.com/armando-genis/f1_tenth_ros2/blob/main/images/car_f1_10.gif)
 
@@ -19,6 +20,11 @@ colcon build --packages-select stanley_node_pkg
 source install/setup.bash
 ros2 launch stanley_node_pkg stanley_controller.launch.py
 ```
+
+## Documentation
+
+[Stanley lateral controller](https://ai.stanford.edu/~gabeh/papers/hoffmann_stanley_control07.pdf)
+
 
 # obstacle avoidance
 
@@ -35,6 +41,9 @@ ros2 launch obstacle_pkg Obstacles.launch.py
 f1_tenth_ros2/
 |-- regulated_pure_pursuit
 ```
+
+
+[Stanley lateral controller](https://ai.stanford.edu/~gabeh/papers/hoffmann_stanley_control07.pdf)
 
 
 
