@@ -21,12 +21,11 @@ source install/setup.bash
 ros2 launch stanley_node_pkg stanley_controller.launch.py
 ```
 
-## Documentation
 
-[Stanley lateral controller](https://ai.stanford.edu/~gabeh/papers/hoffmann_stanley_control07.pdf)
 
 
 # obstacle avoidance
+
 
 ```bash
 source /opt/ros/foxy/setup.bash #for ros2 foxy
@@ -40,15 +39,24 @@ ros2 launch obstacle_pkg Obstacles.launch.py
 ```bash
 f1_tenth_ros2/
 |-- regulated_pure_pursuit
+|-- obstacle_pkg
+|-- waypoint_visualizer
 ```
-
-
-[Stanley lateral controller](https://ai.stanford.edu/~gabeh/papers/hoffmann_stanley_control07.pdf)
-
-
 
 ## Authors
 
 - [@armando-genis](https://github.com/armando-genis)
 - [@RodrigoGE9772](https://github.com/RodrigoGE9772)
 - [@Alexjgxt18](https://github.com/Alexjgxt18)
+
+## Documentation
+
+[Stanley lateral controller](https://ai.stanford.edu/~gabeh/papers/hoffmann_stanley_control07.pdf)
+[Obstacle avoidance ref1](http://www.iri.upc.edu/files/academic/master_thesis/32-MS-Thesis.pdf)
+[Obstacle avoidance ref2](https://ipsj.ixsq.nii.ac.jp/ej/?action=repository_uri&item_id=222945&file_id=1&file_no=1)
+[Frenet frame ref1](https://fjp.at/posts/optimal-frenet/)
+[Frenet frame ref2](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/FrenetOptimalTrajectory/frenet_optimal_trajectory.py)
+
+
+
+
