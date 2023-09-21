@@ -7,7 +7,7 @@ def generate_launch_description():
 
     return LaunchDescription([
         Node(
-            package='obstacle_pkg',
+            package='frenet_pkg',
             executable='Frenet_node',
             name='Frenet_node',
             output='screen',

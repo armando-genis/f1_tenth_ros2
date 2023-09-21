@@ -65,12 +65,12 @@ f1_tenth_ros2/
 
 ## Documentation
 
-[Stanley lateral controller](https://ai.stanford.edu/~gabeh/papers/hoffmann_stanley_control07.pdf)
-[Stanley lateral controller](https://github.com/Hyunwoo-Park-Yonsei/Stanley_method/blob/main/01_stanley.py)
-[Obstacle avoidance ref1](http://www.iri.upc.edu/files/academic/master_thesis/32-MS-Thesis.pdf)
-[Obstacle avoidance ref2](https://ipsj.ixsq.nii.ac.jp/ej/?action=repository_uri&item_id=222945&file_id=1&file_no=1)
-[Frenet frame ref1](https://fjp.at/posts/optimal-frenet/)
-[Frenet frame ref2](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/FrenetOptimalTrajectory/frenet_optimal_trajectory.py)
+- [Stanley lateral controller](https://ai.stanford.edu/~gabeh/papers/hoffmann_stanley_control07.pdf)
+- [Stanley lateral controller](https://github.com/Hyunwoo-Park-Yonsei/Stanley_method/blob/main/01_stanley.py)
+- [Obstacle avoidance ref1](http://www.iri.upc.edu/files/academic/master_thesis/32-MS-Thesis.pdf)
+- [Obstacle avoidance ref2](https://ipsj.ixsq.nii.ac.jp/ej/?action=repository_uri&item_id=222945&file_id=1&file_no=1)
+- [Frenet frame ref1](https://fjp.at/posts/optimal-frenet/)
+- [Frenet frame ref2](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/FrenetOptimalTrajectory/frenet_optimal_trajectory.py)
 
 
 
