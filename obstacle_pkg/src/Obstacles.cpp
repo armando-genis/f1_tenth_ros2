@@ -19,6 +19,7 @@ private:
     // function declarations
     void pub_callback();
     void scan_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg);
+    void clusters_points_data();
 
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr scan_subscriber_;
@@ -60,6 +61,7 @@ void Obstacles::scan_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg)
     range_max = msg->range_max;
     ranges = msg->ranges;
 
+    // http://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/Point.html
     // make a cluster of points when a obstacle is detected
     vector<std::vector<geometry_msgs::msg::Point>> clusters;
     vector<geometry_msgs::msg::Point> current_cluster;
@@ -122,7 +124,12 @@ void Obstacles::scan_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg)
 
     // RCLCPP_INFO(this->get_logger(), "Number of clusters detected: %d", numOfClusters);
     clusters_points.resize(clusters.size());
-    // Visualize the clusters
+
+    vector<size_t> cluster_sizes;
+    vector<float> avg_distances;
+
+
+    // Visualize the clusters and calculate the average distance of the points in the cluster
     visualization_msgs::msg::MarkerArray marker_array;
     for (size_t cluster_id = 0; cluster_id < clusters.size(); cluster_id++)
     {
@@ -141,17 +148,31 @@ void Obstacles::scan_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg)
         marker.color.a = 1.0;
         marker.lifetime = rclcpp::Duration(0, 500000000); 
 
+        // compute the size of the cluster. How many individual points (from the LaserScan) were grouped together to form that particular cluster.
+        size_t cluster_size = clusters[cluster_id].size();
+        cluster_sizes.push_back(cluster_size);
+        float total_distance = 0.0f;
+
         // Add points of the cluster to the marker
         for (const auto &pt : clusters[cluster_id]) {
             marker.points.push_back(pt);
             clusters_points[cluster_id].push_back(pt);
-        }
+            // compute the average distance of the points in the cluster
+            float distance = sqrt(pt.x * pt.x + pt.y * pt.y);
+            total_distance += distance;
 
+        }
+        avg_distances.push_back(total_distance / cluster_size);
         marker_array.markers.push_back(marker);
+        
     }
 
     marker_array_publisher_->publish(marker_array);
+    for (size_t i = 0; i < clusters.size(); i++) {
+        RCLCPP_INFO(this->get_logger(), "Cluster %zu: Size = %zu, Avg Distance = %f", i, cluster_sizes[i], avg_distances[i]);
+    }
 }
+
 
 
 int main(int argc, char** argv) {
