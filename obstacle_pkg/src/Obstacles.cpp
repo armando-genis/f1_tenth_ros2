@@ -86,7 +86,7 @@ void Obstacles::scan_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg)
                 // If the distance between the current point and the previous point is greater than 0.5m, then the current point is considered to be part of a new cluster
                 if (prev_inf == false) {
                     float distance_to_prev_point = sqrt(pow((x_curr-x_prev),2) + pow((y_curr-y_prev),2));
-                    
+
                     if (distance_to_prev_point < thresh_dist_points) {
                         current_cluster.push_back(p);
                     } else {
@@ -118,11 +118,10 @@ void Obstacles::scan_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg)
     }
     if (!current_cluster.empty()) {
         clusters.push_back(current_cluster);
-        clusters.clear();
     }
 
     // RCLCPP_INFO(this->get_logger(), "Number of clusters detected: %d", numOfClusters);
-
+    clusters_points.resize(clusters.size());
     // Visualize the clusters
     visualization_msgs::msg::MarkerArray marker_array;
     for (size_t cluster_id = 0; cluster_id < clusters.size(); cluster_id++)
@@ -152,7 +151,6 @@ void Obstacles::scan_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg)
     }
 
     marker_array_publisher_->publish(marker_array);
-
 }
 
 
