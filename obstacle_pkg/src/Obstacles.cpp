@@ -43,7 +43,6 @@ Obstacles::~Obstacles()
 {
 }
 
-
 void Obstacles::pub_callback()
 {
 
@@ -127,7 +126,6 @@ void Obstacles::scan_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg)
 
     vector<size_t> cluster_sizes;
     vector<float> avg_distances;
-
 
     // Visualize the clusters and calculate the average distance of the points in the cluster
     visualization_msgs::msg::MarkerArray marker_array;
