@@ -11,6 +11,7 @@ find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED) 
 find_package(visualization_msgs REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -33,9 +34,16 @@ install(TARGETS
   DESTINATION lib/${PROJECT_NAME}
 )
 
+
 install(
-  DIRECTORY launch src
+  DIRECTORY launch src msg
   DESTINATION share/${PROJECT_NAME}
+)
+
+
+rosidl_generate_interfaces(${PROJECT_NAME}
+  "msg/ObstacleData.msg"
+  DEPENDENCIES geometry_msgs
 )
 
 ament_package()

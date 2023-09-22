@@ -1,6 +1,8 @@
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/laser_scan.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
+#include <obstacle_pkg/msg/obstacle_data.hpp>
+
 
 using namespace std;
 
