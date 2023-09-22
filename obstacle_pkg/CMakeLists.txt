@@ -11,6 +11,8 @@ find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED) 
 find_package(visualization_msgs REQUIRED)
+find_package(msg_custom_f1 REQUIRED)
+
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -25,7 +27,7 @@ if(BUILD_TESTING)
 endif()
 
 add_executable(obstacle_avoidance_node src/Obstacles.cpp)
-ament_target_dependencies(obstacle_avoidance_node rclcpp std_msgs sensor_msgs visualization_msgs)
+ament_target_dependencies(obstacle_avoidance_node rclcpp std_msgs sensor_msgs visualization_msgs msg_custom_f1)
 
 install(TARGETS
   obstacle_avoidance_node
