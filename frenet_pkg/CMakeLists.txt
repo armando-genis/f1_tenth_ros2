@@ -11,6 +11,7 @@ find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(visualization_msgs REQUIRED)
+find_package(msg_custom_f1 REQUIRED)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -26,7 +27,7 @@ endif()
 
 
 add_executable(Frenet_node src/Frenet.cpp)
-ament_target_dependencies(Frenet_node rclcpp std_msgs visualization_msgs)
+ament_target_dependencies(Frenet_node rclcpp std_msgs visualization_msgs msg_custom_f1)
 target_link_libraries(Frenet_node Eigen3::Eigen)
 
 

@@ -1,6 +1,7 @@
 #include <rclcpp/rclcpp.hpp>
 // ROS
 #include <visualization_msgs/msg/marker_array.hpp>
+#include <msg_custom_f1/msg/obstacle_data.hpp>
 // C++
 #include <iostream>
 #include <vector>
@@ -13,9 +14,14 @@ class Frenet : public rclcpp::Node
 private:
     /* data */
     void timer_callback();
-    void marker_array_callback(const visualization_msgs::msg::MarkerArray::SharedPtr msg);
+    void obstacle_arrays_callback(const msg_custom_f1::msg::ObstacleData::SharedPtr msg);
+    vector<uint32_t> cluster_sizes;
+    vector<float> avg_distances;
+    vector<vector<geometry_msgs::msg::Point>> cluster_points;
+
+
     rclcpp::TimerBase::SharedPtr timer_;
-    rclcpp::Subscription<visualization_msgs::msg::MarkerArray>::SharedPtr marker_array_subscriber_;
+    rclcpp::Subscription<msg_custom_f1::msg::ObstacleData>::SharedPtr obstacle_subscriber_;
 
 public:
     Frenet(/* args */);
@@ -25,8 +31,9 @@ public:
 Frenet::Frenet(/* args */) : Node("Frenet_node")
 {
     timer_ = this->create_wall_timer(200ms, std::bind(&Frenet::timer_callback, this));
-    marker_array_subscriber_ = this->create_subscription<visualization_msgs::msg::MarkerArray>("/cluster_markers", 10, std::bind(&Frenet::marker_array_callback, this, std::placeholders::_1));
+    obstacle_subscriber_ = this->create_subscription<msg_custom_f1::msg::ObstacleData>("/cluster_markers", 10, std::bind(&Frenet::obstacle_arrays_callback, this, std::placeholders::_1));
     RCLCPP_INFO(this->get_logger(), "Stanley_controller_node initialized");
+    
 }
 
 Frenet::~Frenet()
@@ -35,13 +42,23 @@ Frenet::~Frenet()
 
 void Frenet::timer_callback()
 {
-    RCLCPP_INFO(this->get_logger(), "Hello, world!");
+    // RCLCPP_INFO(this->get_logger(), "Hello, world!");
 }
 
-void Frenet::marker_array_callback(const visualization_msgs::msg::MarkerArray::SharedPtr msg)
+void Frenet::obstacle_arrays_callback(const msg_custom_f1::msg::ObstacleData::SharedPtr msg)
 {
     // Handle the received message here
-    RCLCPP_INFO(this->get_logger(), "Received a MarkerArray message!");
+    if (!msg->cluster_sizes.empty()) {
+        RCLCPP_INFO(this->get_logger(), "Received a MarkerArray message!");
+        cluster_sizes = msg->cluster_sizes;
+        avg_distances = msg->avg_distances;
+
+        cluster_points.clear();
+        for (const auto& point_array : msg->cluster_points) {
+            cluster_points.push_back(point_array.points);
+        }
+    }
+    
 }
 
 int main(int argc, char * argv[])
