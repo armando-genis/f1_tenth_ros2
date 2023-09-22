@@ -26,7 +26,9 @@ ros2 launch stanley_node_pkg stanley_controller.launch.py
 
 
 # obstacle detecter
-By subscribing to the /scan topic, the node processes sensor_msgs::LaserScan data, identifying clusters (or groups) of points that represent obstacles based on their proximity, and visualizes these obstacles as point clusters using markers in the rviz visualization tool. Also, it computes the size of the cluster and the average distance of points in that cluster. It use the `geometry_msgs::msg::Point` message to represent a point in a 3D space, with its x, y, and z components, it provides a standard, consistent, and compatible way to represent, process, and visualize the spatial points derived from the LaserScan data
+By subscribing to the /scan topic, the node processes sensor_msgs::LaserScan data, identifying clusters (or groups) of points that represent obstacles based on their proximity, and visualizes these obstacles as point clusters using markers in the rviz visualization tool. Also, it computes the size of the cluster and the average distance of points in that cluster. It use the `geometry_msgs::msg::Point` message to represent a point in a 3D space, with its x, y, and z components, it provides a standard, consistent, and compatible way to represent, process, and visualize the spatial points derived from the LaserScan data.
+
+![Description of GIF](https://github.com/armando-genis/f1_tenth_ros2/blob/main/images/obstacles_pk.gif)
 
 ```bash
 cd ~/ros2_ws
