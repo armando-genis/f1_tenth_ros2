@@ -23,9 +23,12 @@ private:
     void scan_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg);
     void clusters_points_data();
 
+
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr scan_subscriber_;
     rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_array_publisher_;
+    rclcpp::Publisher<msg_custom_f1::msg::ObstacleData>::SharedPtr obstacle_data_publisher_;
+
 public:
     Obstacles(/* args */);
     ~Obstacles();
@@ -37,6 +40,7 @@ Obstacles::Obstacles(/* args */): Node("Obstacle_avoidance_node")
     timer_ = this->create_wall_timer(std::chrono::milliseconds(200), std::bind(&Obstacles::pub_callback, this));
     scan_subscriber_ = this->create_subscription<sensor_msgs::msg::LaserScan>("/scan", 10, std::bind(&Obstacles::scan_callback, this, std::placeholders::_1));
     marker_array_publisher_ = this->create_publisher<visualization_msgs::msg::MarkerArray>("/cluster_markers", 10);
+    obstacle_data_publisher_ = this->create_publisher<msg_custom_f1::msg::ObstacleData>("/obstacle_data", 10);
     RCLCPP_INFO(this->get_logger(), "obstacle_avoidance_node initialized");
 
 }
@@ -126,11 +130,12 @@ void Obstacles::scan_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg)
     // RCLCPP_INFO(this->get_logger(), "Number of clusters detected: %d", numOfClusters);
     clusters_points.resize(clusters.size());
 
-    vector<size_t> cluster_sizes;
+    vector<uint32_t> cluster_sizes;
     vector<float> avg_distances;
 
     // Visualize the clusters and calculate the average distance of the points in the cluster
     visualization_msgs::msg::MarkerArray marker_array;
+    
     for (size_t cluster_id = 0; cluster_id < clusters.size(); cluster_id++)
     {
         visualization_msgs::msg::Marker marker;
@@ -150,7 +155,7 @@ void Obstacles::scan_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg)
 
         // compute the size of the cluster. How many individual points (from the LaserScan) were grouped together to form that particular cluster.
         size_t cluster_size = clusters[cluster_id].size();
-        cluster_sizes.push_back(cluster_size);
+        cluster_sizes.push_back(static_cast<uint32_t>(cluster_size));
         float total_distance = 0.0f;
 
         // Add points of the cluster to the marker
@@ -169,8 +174,17 @@ void Obstacles::scan_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg)
 
     marker_array_publisher_->publish(marker_array);
     for (size_t i = 0; i < clusters.size(); i++) {
-        RCLCPP_INFO(this->get_logger(), "Cluster %zu: Size = %zu, Avg Distance = %f", i, cluster_sizes[i], avg_distances[i]);
+        RCLCPP_INFO(this->get_logger(), "Cluster %zu: Size = %u, Avg Distance = %f", i, cluster_sizes[i], avg_distances[i]);
     }
+
+    // Populate and publish the custom message
+    msg_custom_f1::msg::ObstacleData obstacle_msg;
+    for (const auto &cluster : clusters_points) {
+        obstacle_msg.cluster_points.insert(obstacle_msg.cluster_points.end(), cluster.begin(), cluster.end());
+    }
+    obstacle_msg.cluster_sizes = cluster_sizes;
+    obstacle_msg.avg_distances = avg_distances;
+    obstacle_data_publisher_->publish(obstacle_msg);
 }
 
 
