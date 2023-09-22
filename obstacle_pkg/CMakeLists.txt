@@ -11,7 +11,6 @@ find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED) 
 find_package(visualization_msgs REQUIRED)
-find_package(rosidl_default_generators REQUIRED)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -25,7 +24,6 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-
 add_executable(obstacle_avoidance_node src/Obstacles.cpp)
 ament_target_dependencies(obstacle_avoidance_node rclcpp std_msgs sensor_msgs visualization_msgs)
 
@@ -34,16 +32,9 @@ install(TARGETS
   DESTINATION lib/${PROJECT_NAME}
 )
 
-
 install(
-  DIRECTORY launch src msg
+  DIRECTORY launch src
   DESTINATION share/${PROJECT_NAME}
-)
-
-
-rosidl_generate_interfaces(${PROJECT_NAME}
-  "msg/ObstacleData.msg"
-  DEPENDENCIES geometry_msgs
 )
 
 ament_package()
