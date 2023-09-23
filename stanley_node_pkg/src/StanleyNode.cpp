@@ -197,7 +197,7 @@ void StanleyNode::visualizeNewWaypoints() {
         marker.type = visualization_msgs::msg::Marker::SPHERE;
         marker.action = visualization_msgs::msg::Marker::ADD;
         marker.pose.position.x = new_waypoints[i](0);  // Assuming x is the first element
-        marker.pose.position.y = new_waypoints[i](1);  // Assuming y is the second element
+        marker.pose.position.y = new_waypoints[i](1); 
         marker.scale.x = 0.12;  // Slightly larger than interpolated for differentiation
         marker.scale.y = 0.12;
         marker.scale.z = 0.12;

@@ -173,9 +173,9 @@ void Obstacles::scan_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg)
     }
 
     marker_array_publisher_->publish(marker_array);
-    // for (size_t i = 0; i < clusters.size(); i++) {
-    //     RCLCPP_INFO(this->get_logger(), "Cluster %zu: Size = %u, Avg Distance = %f", i, cluster_sizes[i], avg_distances[i]);
-    // }
+    for (size_t i = 0; i < clusters.size(); i++) {
+        RCLCPP_INFO(this->get_logger(), "Cluster %zu: Size = %u, Avg Distance = %f", i, cluster_sizes[i], avg_distances[i]);
+    }
 
     // Populate and publish the custom message
     msg_custom_f1::msg::ObstacleData obstacle_msg;
