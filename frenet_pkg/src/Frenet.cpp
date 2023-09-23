@@ -36,7 +36,6 @@ Frenet::Frenet(/* args */) : Node("Frenet_node")
     obstacle_subscriber_ = this->create_subscription<msg_custom_f1::msg::ObstacleData>("/cluster_markers", 10, std::bind(&Frenet::obstacle_arrays_callback, this, std::placeholders::_1));
     newWaypoints_subscriber_ = this->create_subscription<visualization_msgs::msg::MarkerArray>("newWaypoints", 10, std::bind(&Frenet::newWaypoints_callback, this, std::placeholders::_1));
     RCLCPP_INFO(this->get_logger(), "Stanley_controller_node initialized");
-    
 }
 
 Frenet::~Frenet()
